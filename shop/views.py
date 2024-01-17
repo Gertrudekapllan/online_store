@@ -1,4 +1,7 @@
 from rest_framework import generics
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
 from .models import Category, Product, UserProfile, Order
 from .serializers import CategorySerializer, ProductSerializer, UserProfileSerializer, OrderSerializer
 
@@ -26,3 +29,12 @@ class OrderList(generics.ListCreateAPIView):
 class OrderDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
+
+
+class ProductAPIView(APIView):
+    def get(self, request):
+        lst = Product.objects.all().values()
+        return Response({'posts': list(lst)})
+
+    def post(self, request):
+        return Response({'product': "RAPAPAM"})
