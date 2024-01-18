@@ -1,7 +1,10 @@
-from rest_framework import generics
+from django.contrib.gis import serializers
+from django.forms import model_to_dict
+from django.http import Http404
+from rest_framework import generics, request, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
+from django.shortcuts import get_object_or_404
 from .models import Category, Product, UserProfile, Order
 from .serializers import CategorySerializer, ProductSerializer, UserProfileSerializer, OrderSerializer
 
@@ -32,9 +35,40 @@ class OrderDetail(generics.RetrieveUpdateDestroyAPIView):
 
 
 class ProductAPIView(APIView):
+    # def post(self, request):
+    #     lst = Product.objects.all().values()
+    #     return Response({'posts': list(lst)})
+
     def get(self, request):
-        lst = Product.objects.all().values()
-        return Response({'posts': list(lst)})
+        p = Product.objects.all()
+        return Response({'products': ProductSerializer(p, many=True).data})
 
     def post(self, request):
-        return Response({'product': "RAPAPAM"})
+        new_post = Product.objects.create(
+            name=request.data['name'],
+            description=request.data['description'],
+            price=request.data['price'],
+            category_id=request.data['category_id']
+        )
+        return Response({'post': model_to_dict(new_post)})
+
+
+class CategoryAPIView(APIView):
+    def post(self, request):
+        new_category = Category.objects.create(
+            name=request.data['name']
+        )
+        return Response({'category': model_to_dict(new_category)})
+
+    def delete(self, request, pk):
+        c = self.get_object(pk)
+        c.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def get_object(self, pk):
+        try:
+            return Category.objects.get(pk=pk)
+        except Category.DoesNotExist:
+            raise Http404
+
+
