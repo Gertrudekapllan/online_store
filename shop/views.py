@@ -44,13 +44,10 @@ class ProductAPIView(APIView):
         return Response({'products': ProductSerializer(p, many=True).data})
 
     def post(self, request):
-        new_post = Product.objects.create(
-            name=request.data['name'],
-            description=request.data['description'],
-            price=request.data['price'],
-            category_id=request.data['category_id']
-        )
-        return Response({'post': model_to_dict(new_post)})
+        serializer = ProductSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({'post': serializer.data})
 
 
 class CategoryAPIView(APIView):

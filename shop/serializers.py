@@ -14,24 +14,24 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ProductSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Product
-        fields = '__all__'
-# class ProductModel:
-#     def __init__(self, name, description, price, category_id):
-#         self.name = name
-#         self.description = description
-#         self.price = price
-#         self.category_id = category_id
-#
-#
-# class ProductSerializer(serializers.Serializer):
-#     name = serializers.CharField(max_length=255)
-#     description = serializers.CharField()
-#     price = serializers.FloatField()
-#     category_id = serializers.CharField()
-#
+class ProductModel:
+    def __init__(self, name, description, price, category_id):
+        self.name = name
+        self.description = description
+        self.price = price
+        self.category_id = category_id
+
+
+class ProductSerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=255)
+    description = serializers.CharField()
+    price = serializers.FloatField()
+    category_id = serializers.CharField()
+
+    def create(self, validated_data):
+        return Product.objects.create(**validated_data)
+
+
 #
 # def encode():
 #     model = ProductModel('fish', 'day', price=2000, category_id=4)
