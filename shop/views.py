@@ -34,20 +34,56 @@ class OrderDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = OrderSerializer
 
 
-class ProductAPIView(APIView):
-    # def post(self, request):
-    #     lst = Product.objects.all().values()
-    #     return Response({'posts': list(lst)})
+class ProductAPIList(generics.ListCreateAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
 
-    def get(self, request):
-        p = Product.objects.all()
-        return Response({'products': ProductSerializer(p, many=True).data})
 
-    def post(self, request):
-        serializer = ProductSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response({'post': serializer.data})
+class ProductAPIUpdate(generics.UpdateAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+class ProductAPIDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+
+
+
+# class ProductAPIView(APIView):
+#     def post(self, request):
+#         lst = Product.objects.all().values()
+#         return Response({'posts': list(lst)})
+#
+#     def get(self, request):
+#         p = Product.objects.all()
+#         return Response({'products': ProductSerializer(p, many=True).data})
+#
+#     def post(self, request):
+#         serializer = ProductSerializer(data=request.data)
+#         serializer.is_valid(raise_exception=True)
+#         serializer.save()
+#         return Response({'post': serializer.data})
+#
+#     def put(self, request, *args, **kwargs):
+#         pk = kwargs.get('pk', None)
+#         if not pk:
+#             return Response({'error': 'Method put not allowed'})
+#         try:
+#             instance = Product.objects.get(pk=pk)
+#         except:
+#             return Response({'error': 'Object does not exists'})
+#         serializer = ProductSerializer(data=request.data, instance=instance)
+#         serializer.is_valid(raise_exception=True)
+#         serializer.save()
+#         return Response({'post': serializer.data})
+#
+#     def delete(self, request, *args, **kwargs):
+#         pk = kwargs.get('pk', None)
+#         try:
+#             product = Product.objects.get(pk=pk)
+#         except Product.DoesNotExist:
+#             return Response({'error': 'Method delete not allowed'})
+#         product.delete()
+#         return Response({'deleted': 'Method was deleted'})
 
 
 class CategoryAPIView(APIView):
@@ -67,5 +103,3 @@ class CategoryAPIView(APIView):
             return Category.objects.get(pk=pk)
         except Category.DoesNotExist:
             raise Http404
-
-
