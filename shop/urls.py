@@ -1,16 +1,45 @@
 from django.urls import path
+from rest_framework import routers
 from rest_framework.routers import DefaultRouter, SimpleRouter
 
 from .views import *
-router = SimpleRouter()
-router.register(r'product', ProductViewSet)
+
+#
+# class MyCustomRouter(routers.SimpleRouter):
+#     routers = [
+#         routers.Route(
+#             url=r'^{prefix}$',
+#             mapping={'get': 'list'},
+#             name='{basename}-list',
+#             detail=False,
+#             initkwargs={'suffix': 'List'}
+#         ),
+#         routers.Route(
+#             url=r'^{prefix}/{lookup}$',
+#             mapping={'get': 'retrieve'},
+#             name='{basename}-detail',
+#             detail=True,
+#             initkwargs={'suffix': 'Detail'}
+#         )
+#     ]
+
+
+# router = MyCustomRouter()
+# router = DefaultRouter()
+# router.register(r'product', ProductViewSet, basename='product')
+# router.register(r'category', CategoryViewSet)
+# router.register(r'user', UserProfileViewSet)
+# router.register(r'order', OrderViewSet)
+# print(router.urls)
 urlpatterns = [
     #     path('categories/', CategoryList.as_view(), name='category-list'),
-    #     path('products/', ProductList.as_view(), name='product-list'),
+    path('products/', ProductAPIList.as_view(), name='product-list'),
+    path('product/update/<int:pk>', ProductAPIUpdate.as_view(), name='product-list'),
+    path('products/delete/<int:pk>', ProductAPIDestroy.as_view(), name='product-list'),
     #     path('product/', ProductAPIList.as_view(), name='product-view'),
     #     path('product/list/<int:pk>', ProductAPIList.as_view(), name='product-view'),  # list
-    path('product/list/<int:pk>', ProductViewSet.as_view({'put': 'update'}), name='product-view'),
-    path('product/', ProductViewSet.as_view({'get': 'list'}), name='product-view'),
+    # path('product/<int:pk>', ProductViewSet.as_view({'put': 'update'}), name='product-view'),
+    # path('product/', ProductViewSet.as_view({'get': 'list'}), name='product-view'),
     #     path('product/<int:pk>', ProductAPIUpdate.as_view(), name='product-view'),
     #     path('category/<int:pk>', CategoryAPIView.as_view(), name='category-view'),
     #     path('productdetail/<int:pk>', ProductAPIDetailView.as_view(), name='product-detail'),

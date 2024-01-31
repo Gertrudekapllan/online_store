@@ -1,18 +1,86 @@
 from django.contrib.gis import serializers
 from django.forms import model_to_dict
 from django.http import Http404
-from rest_framework import generics, request, status, viewsets
+from rest_framework import generics, request, status, viewsets, mixins
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
+from rest_framework.viewsets import GenericViewSet
+
 from .models import Category, Product, UserProfile, Order
 from .serializers import CategorySerializer, ProductSerializer, UserProfileSerializer, OrderSerializer
 
 
-class ProductViewSet(viewsets.ModelViewSet):
+class ProductViewSet(mixins.CreateModelMixin,
+                     mixins.RetrieveModelMixin,
+                     mixins.UpdateModelMixin,
+                     mixins.DestroyModelMixin,
+                     mixins.ListModelMixin,
+                     GenericViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
+    def get_queryset(self):
+        pk = self.kwargs.get('pk')
+        if pk is None:
+            return Product.objects.all()[:4]
+        return Product.objects.filter(pk=pk)
+
+    # @action(methods=['get'], detail=False)
+    # def category(self, request, pk=None):
+    #     cats = Category.objects.all()
+    #     return Response({'cats': [c.name for c in cats]})
+
+    # @action(methods=['get'], detail=True)
+    # def category(self, request, pk=None):
+    #     cats = Category.objects.get(pk=pk)
+    #     return Response({'cats': cats.name})
+
+
+class CategoryViewSet(mixins.CreateModelMixin,
+                      mixins.RetrieveModelMixin,
+                      mixins.UpdateModelMixin,
+                      mixins.DestroyModelMixin,
+                      mixins.ListModelMixin,
+                      GenericViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
+
+class UserProfileViewSet(mixins.CreateModelMixin,
+                         mixins.RetrieveModelMixin,
+                         mixins.UpdateModelMixin,
+                         mixins.DestroyModelMixin,
+                         mixins.ListModelMixin,
+                         GenericViewSet):
+    queryset = UserProfile.objects.all()
+    serializer_class = UserProfileSerializer
+
+
+class OrderViewSet(mixins.CreateModelMixin,
+                   mixins.RetrieveModelMixin,
+                   mixins.UpdateModelMixin,
+                   mixins.DestroyModelMixin,
+                   mixins.ListModelMixin,
+                   GenericViewSet):
+    queryset = UserProfile.objects.all()
+    serializer_class = UserProfileSerializer
+
+
+class ProductAPIList(generics.ListAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+
+
+class ProductAPIUpdate(generics.UpdateAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+
+
+class ProductAPIDestroy(generics.DestroyAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
 
 # class CategoryList(generics.ListCreateAPIView):
 #     queryset = Category.objects.all()
@@ -92,20 +160,20 @@ class ProductViewSet(viewsets.ModelViewSet):
 #         return Response({'deleted': 'Method was deleted'})
 
 
-class CategoryAPIView(APIView):
-    def post(self, request):
-        new_category = Category.objects.create(
-            name=request.data['name']
-        )
-        return Response({'category': model_to_dict(new_category)})
-
-    def delete(self, request, pk):
-        c = self.get_object(pk)
-        c.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-    def get_object(self, pk):
-        try:
-            return Category.objects.get(pk=pk)
-        except Category.DoesNotExist:
-            raise Http404
+# class CategoryAPIView(APIView):
+#     def post(self, request):
+#         new_category = Category.objects.create(
+#             name=request.data['name']
+#         )
+#         return Response({'category': model_to_dict(new_category)})
+#
+#     def delete(self, request, pk):
+#         c = self.get_object(pk)
+#         c.delete()
+#         return Response(status=status.HTTP_204_NO_CONTENT)
+#
+#     def get_object(self, pk):
+#         try:
+#             return Category.objects.get(pk=pk)
+#         except Category.DoesNotExist:
+#             raise Http404
