@@ -33,8 +33,8 @@ class ProductSerializer(serializers.ModelSerializer):
     # category_id = serializers.CharField()
     # time_update = serializers.DateTimeField(read_only=True)
 
-    # def create(self, validated_data):
-    #     return Product.objects.create(**validated_data)
+    def create(self, validated_data):
+        return Product.objects.create(**validated_data)
     #
     # def update(self, instance, validated_data):
     #     instance.name = validated_data.get('name', instance.name)

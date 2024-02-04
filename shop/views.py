@@ -3,10 +3,13 @@ from django.forms import model_to_dict
 from django.http import Http404
 from rest_framework import generics, request, status, viewsets, mixins
 from rest_framework.decorators import action
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from rest_framework.viewsets import GenericViewSet
+from rest_framework.permissions import IsAuthenticated
+
 
 from .models import Category, Product, UserProfile, Order
 from .serializers import CategorySerializer, ProductSerializer, UserProfileSerializer, OrderSerializer
@@ -20,6 +23,11 @@ class ProductViewSet(mixins.CreateModelMixin,
                      GenericViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    permission_classes = [IsAuthenticated]
+
+    # def list(self, request, *args, **kwargs):
+    #     queryset = Product.objects.all()
+    #     return super().list(request, *args, **kwargs)
 
     def get_queryset(self):
         pk = self.kwargs.get('pk')
@@ -58,68 +66,53 @@ class UserProfileViewSet(mixins.CreateModelMixin,
     serializer_class = UserProfileSerializer
 
 
-class OrderViewSet(mixins.CreateModelMixin,
-                   mixins.RetrieveModelMixin,
-                   mixins.UpdateModelMixin,
-                   mixins.DestroyModelMixin,
-                   mixins.ListModelMixin,
-                   GenericViewSet):
-    queryset = UserProfile.objects.all()
-    serializer_class = UserProfileSerializer
-
-
 class ProductAPIList(generics.ListAPIView):
-    queryset = Product.objects.all()
+    queryset = Product.objects.all()[:6]
     serializer_class = ProductSerializer
+    permission_classes = ()
 
 
 class ProductAPIUpdate(generics.UpdateAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    lookup_field = 'pk'
+
+    def get(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "mobile number updated successfully"})
+
+        else:
+            return Response({"message": "failed", "details": serializer.errors})
 
 
 class ProductAPIDestroy(generics.DestroyAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
 
-# class CategoryList(generics.ListCreateAPIView):
-#     queryset = Category.objects.all()
-#     serializer_class = CategorySerializer
-#
-#
-# class ProductList(generics.ListCreateAPIView):
-#     queryset = Product.objects.all()
-#     serializer_class = ProductSerializer
-#
-#
-# class UserProfileDetail(generics.RetrieveUpdateAPIView):
-#     queryset = UserProfile.objects.all()
-#     serializer_class = UserProfileSerializer
-#
-#
-# class OrderList(generics.ListCreateAPIView):
-#     queryset = Order.objects.all()
-#     serializer_class = OrderSerializer
-#
-#
-# class OrderDetail(generics.RetrieveUpdateDestroyAPIView):
-#     queryset = Order.objects.all()
-#     serializer_class = OrderSerializer
-#
-#
-# class ProductAPIList(generics.ListCreateAPIView):
-#     queryset = Product.objects.all()
-#     serializer_class = ProductSerializer
-#
-#
-# class ProductAPIUpdate(generics.UpdateAPIView):
-#     queryset = Product.objects.all()
-#     serializer_class = ProductSerializer
-#
-#
-# class ProductAPIDetailView(generics.RetrieveUpdateDestroyAPIView):
-#     queryset = Product.objects.all()
-#     serializer_class = ProductSerializer
+    def get(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
+
+class CategoryList(generics.ListCreateAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
+
+class UserProfileDetail(generics.RetrieveAPIView):
+    queryset = UserProfile.objects.all()
+    serializer_class = UserProfileSerializer
+
 # от
 
 # class ProductAPIView(APIView):
