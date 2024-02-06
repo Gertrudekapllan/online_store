@@ -28,5 +28,8 @@ urlpatterns = [
     path('', include(router.urls)),
     path("accounts/", include("accounts.urls")),
     path("accounts/", include("django.contrib.auth.urls")),
+    path('drf-auth/', include('rest_framework.urls'))
+
+
 
 ]
