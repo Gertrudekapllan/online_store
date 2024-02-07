@@ -12,6 +12,7 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser, IsAuthentic
 
 
 from .models import Category, Product, UserProfile, Order
+from .permissons import UserPermission
 from .serializers import CategorySerializer, ProductSerializer, UserProfileSerializer, OrderSerializer
 
 
@@ -23,7 +24,9 @@ class ProductViewSet(mixins.CreateModelMixin,
                      GenericViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = (IsAuthenticated, UserPermission,)
+
+
 
     # def list(self, request, *args, **kwargs):
     #     queryset = Product.objects.all()
@@ -66,6 +69,7 @@ class UserProfileViewSet(mixins.CreateModelMixin,
     serializer_class = UserProfileSerializer
 
 
+
 class ProductAPIList(generics.ListAPIView):
     queryset = Product.objects.all()[:6]
     serializer_class = ProductSerializer
@@ -76,6 +80,7 @@ class ProductAPIUpdate(generics.UpdateAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     lookup_field = 'pk'
+
 
     def get(self, request, *args, **kwargs):
         instance = self.get_object()
