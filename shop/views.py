@@ -12,7 +12,7 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser, IsAuthentic
 
 
 from .models import Category, Product, UserProfile, Order
-from .permissons import UserPermission
+from .permissions import UserPermission
 from .serializers import CategorySerializer, ProductSerializer, UserProfileSerializer, OrderSerializer
 
 
